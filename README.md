@@ -29,7 +29,7 @@ Todas las dependencias necesarias se pueden encontrar en el archivo requirements
 * How to run the program
 * Step-by-step bullets
 ```
-code blocks for commands
+python cuentagotas.py
 ```
 
 
