@@ -7,6 +7,8 @@ Script que toma el valor RGB de un pixel en la pantalla.
 
 Este sencillo script permite tomar el valor RGB de cualquier pixel en la pantalla para copiarlo. Para el GUI, utiliza la librería de Tkinter.  
 
+Pendiente:
+Incluir HEX colors
 
 ## Getting Started
 
