@@ -7,6 +7,7 @@ Script que toma el valor RGB, HEX y HSL de un pixel en la pantalla.
 - Permite capturar el color con la tecla ESPACIO.
 - Visualiza el color elegido en un recuadro con borde.
 - Copia fácilmente los valores RGB, HEX y HSL al portapapeles con un botón.
+- Ajusta los estilos de Tkinter dependiendo de la hora o configuración del sistema
 
 ## Requisitos
 - Python 3.x

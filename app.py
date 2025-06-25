@@ -6,6 +6,7 @@ import pyautogui as pg
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
+import darkdetect
 
 
 def rgb_to_hex(rgb):
@@ -100,12 +101,36 @@ def update_image():
     root.after(10, update_image)
 
 
+# Detectar modo oscuro o claro
+if darkdetect.isDark():
+    BG_COLOR = "#23272e"
+    FG_COLOR = "#f7f7f7"
+    ENTRY_BG = "#2d323a"
+    ENTRY_FG = "#f7f7f7"
+    BOX_BG = "#23272e"
+    BOX_BORDER = "#444"
+    BTN_BG = "#23272e"
+    BTN_FG = "#f7f7f7"
+    INSTR_BG = "#2d323a"
+    INSTR_FG = "#eaeaea"
+else:
+    BG_COLOR = "#f7f7f7"
+    FG_COLOR = "#23272e"
+    ENTRY_BG = "#ffffff"
+    ENTRY_FG = "#23272e"
+    BOX_BG = "#ffffff"
+    BOX_BORDER = "#bbbbbb"
+    BTN_BG = "#f7f7f7"
+    BTN_FG = "#23272e"
+    INSTR_BG = "#eaeaea"
+    INSTR_FG = "#444"
+
 # Ventana principal
 root = tk.Tk()
 root.geometry("320x400")
 root.title("Cuentagotas")
 root.iconbitmap("favicon.ico")
-root.configure(bg="#f7f7f7")  # Fondo general claro
+root.configure(bg=BG_COLOR)
 
 # Configuración de grid para diseño dinámico
 root.rowconfigure(0, weight=2)
@@ -113,10 +138,10 @@ root.rowconfigure(1, weight=1)
 root.columnconfigure(0, weight=1)
 
 # Frame superior minimalista
-frameTop = tk.Frame(root, bg="#f7f7f7")
+frameTop = tk.Frame(root, bg=BG_COLOR)
 frameTop.grid(row=0, column=0, sticky="nsew")
 
-frameTop_center = tk.Frame(frameTop, bg="#f7f7f7")
+frameTop_center = tk.Frame(frameTop, bg=BG_COLOR)
 frameTop_center.pack(expand=True, anchor="center")
 
 # Label de la imagen (sin borde, más pequeño)
@@ -128,8 +153,8 @@ label_font = ("Segoe UI", 10, "normal")
 label_instruction = ttk.Label(
     frameTop_center,
     text='Presiona ESPACIO para capturar',
-    foreground="#444",
-    background="#eaeaea",
+    foreground=INSTR_FG,
+    background=INSTR_BG,
     anchor="center",
     font=label_font,
     padding=(8, 6)
@@ -141,8 +166,8 @@ color_box = tk.Frame(
     frameTop_center,
     width=60,
     height=32,
-    bg="#ffffff",
-    highlightbackground="#bbbbbb",
+    bg=BOX_BG,
+    highlightbackground=BOX_BORDER,
     highlightthickness=1,
     bd=0,
     relief="flat"
@@ -151,17 +176,17 @@ color_box.pack(pady=(0, 8))
 color_box.pack_propagate(False)
 
 # Frame inferior minimalista
-frameBottom = tk.Frame(root, bg="#f7f7f7")
+frameBottom = tk.Frame(root, bg=BG_COLOR)
 frameBottom.grid(row=1, column=0, sticky="nsew")
 
 # Fila de formato minimalista
 style = ttk.Style()
-style.configure("Minimal.TEntry", font=("Segoe UI", 10), padding=2, relief="flat")
-style.configure("Minimal.TLabel", font=("Segoe UI", 9), background="#f7f7f7", foreground="#222")
-style.configure("Minimal.TButton", font=("Segoe UI", 10), padding=0, relief="flat", background="#f7f7f7")
+style.configure("Minimal.TEntry", font=("Segoe UI", 10), padding=2, relief="flat", fieldbackground=ENTRY_BG, foreground=ENTRY_FG)
+style.configure("Minimal.TLabel", font=("Segoe UI", 9), background=BG_COLOR, foreground=FG_COLOR)
+style.configure("Minimal.TButton", font=("Segoe UI", 10), padding=0, relief="flat", background=BTN_BG, foreground=BTN_FG)
 
 def crear_fila_formato(parent, titulo, variable_entry):
-    fila = tk.Frame(parent, bg="#f7f7f7")
+    fila = tk.Frame(parent, bg=BG_COLOR)
     fila.pack(pady=6, anchor="center")
     label = ttk.Label(fila, text=titulo, width=5, anchor="center", style="Minimal.TLabel")
     label.pack(side="left", padx=(0, 4))
