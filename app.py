@@ -31,11 +31,13 @@ def rgb_to_hsl(rgb):
         h /= 6
     return f'H: {int(h*360)} S: {int(s*100)} L: {int(l*100)}'
 
-def copiar_formato(valor):
+def copiar_formato(valor, boton=None):
     root.clipboard_clear()
     root.clipboard_append(valor)
     root.update()
     print(f'Valor copiado al portapapeles: {valor}')
+    mensaje_copiado.config(text="¡Valor copiado!")
+    mensaje_copiado.after(1200, lambda: mensaje_copiado.config(text=""))
 
 def capturarPunto(event=None):
     # Coordenadas del cursor
@@ -49,9 +51,6 @@ def capturarPunto(event=None):
 
     # Obtiene el color del píxel en la posición (0, 0) de la región capturada
     color = im.getpixel((0, 0))
-
-    # Mostrar los valores RGB en el Label
-    rgb_values.set(f'R: {color[0]} \nG: {color[1]} \nB: {color[2]}')
 
     # Colocar los valores RGB en el Entry para copiarlos
     entry_rgb.delete(0, tk.END)
@@ -190,9 +189,29 @@ def crear_fila_formato(parent, titulo, variable_entry):
     fila.pack(pady=6, anchor="center")
     label = ttk.Label(fila, text=titulo, width=5, anchor="center", style="Minimal.TLabel")
     label.pack(side="left", padx=(0, 4))
-    entry = ttk.Entry(fila, textvariable=variable_entry if variable_entry else None, justify='center', width=18, style="Minimal.TEntry")
+    entry = tk.Entry(
+        fila,
+        textvariable=variable_entry if variable_entry else None,
+        justify='center',
+        width=18,
+        fg=ENTRY_FG,
+        bg=ENTRY_BG,
+        relief="flat",
+        font=("Segoe UI", 10)
+    )
     entry.pack(side="left", padx=(0, 4))
-    btn = ttk.Button(fila, text="📋", width=2, style="Minimal.TButton", command=lambda: copiar_formato(entry.get()))
+    btn = tk.Button(
+        fila,
+        text="📋",
+        width=2,
+        fg=BTN_FG,
+        bg=BTN_BG,
+        relief="flat",
+        font=("Segoe UI", 10),
+        activebackground=BOX_BORDER,
+        activeforeground=FG_COLOR,
+        command=lambda: copiar_formato(entry.get(), btn)
+    )
     btn.pack(side="left")
     return entry
 
@@ -207,6 +226,10 @@ entry_rgb = crear_fila_formato(frameBottom, "RGB", var_rgb)
 entry_hex = crear_fila_formato(frameBottom, "HEX", var_hex)
 # HSL
 entry_hsl = crear_fila_formato(frameBottom, "HSL", var_hsl)
+
+# Mensaje de copiado
+mensaje_copiado = tk.Label(frameBottom, text="", fg="#4caf50", bg=BG_COLOR, font=("Segoe UI", 9, "bold"))
+mensaje_copiado.pack(pady=(0, 6))
 
 # Actualiza los valores de los StringVar y Entry en capturarPunto
 def capturarPunto(event=None):
