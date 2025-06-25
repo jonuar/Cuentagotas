@@ -102,54 +102,73 @@ def update_image():
 
 # Ventana principal
 root = tk.Tk()
-root.geometry("350x450")
+root.geometry("320x400")
 root.title("Cuentagotas")
 root.iconbitmap("favicon.ico")
+root.configure(bg="#f7f7f7")  # Fondo general claro
 
-# Frame superior
-frameTop = tk.Frame(root)
-frameTop.pack(side="top", fill="both", expand=True)
-frameTop.pack_propagate(False)  # Evita que el frame cambie de tamaño
+# Configuración de grid para diseño dinámico
+root.rowconfigure(0, weight=2)
+root.rowconfigure(1, weight=1)
+root.columnconfigure(0, weight=1)
 
-# Frame contenedor para centrar vertical y horizontalmente
-frameTop_center = tk.Frame(frameTop)
+# Frame superior minimalista
+frameTop = tk.Frame(root, bg="#f7f7f7")
+frameTop.grid(row=0, column=0, sticky="nsew")
+
+frameTop_center = tk.Frame(frameTop, bg="#f7f7f7")
 frameTop_center.pack(expand=True, anchor="center")
 
-# Label de la imagen
+# Label de la imagen (sin borde, más pequeño)
 label = ttk.Label(frameTop_center)
-label.pack(pady=15)
+label.pack(pady=(18, 8))
 
-# Instrucciones
-label_font = ("Helvetica", 10, "bold")
-label_instruction = ttk.Label(frameTop_center, text='Presiona ESPACIO para capturar', foreground="white", background="black", anchor="center", font=label_font)
-label_instruction.pack(ipadx=5, ipady=10, padx=5)
+# Instrucciones minimalistas
+label_font = ("Segoe UI", 10, "normal")
+label_instruction = ttk.Label(
+    frameTop_center,
+    text='Presiona ESPACIO para capturar',
+    foreground="#444",
+    background="#eaeaea",
+    anchor="center",
+    font=label_font,
+    padding=(8, 6)
+)
+label_instruction.pack(pady=(0, 10))
 
-# Recuadro para mostrar el color elegido
+# Recuadro de color minimalista
 color_box = tk.Frame(
     frameTop_center,
-    width=80,
-    height=40,
+    width=60,
+    height=32,
     bg="#ffffff",
-    highlightbackground="#888888",  # Color del borde
-    highlightthickness=2
+    highlightbackground="#bbbbbb",
+    highlightthickness=1,
+    bd=0,
+    relief="flat"
 )
-color_box.pack(pady=10)
-color_box.pack_propagate(False)  # Mantiene el tamaño fijo
+color_box.pack(pady=(0, 8))
+color_box.pack_propagate(False)
 
-# Frame inferior
-frameBottom = ttk.Frame(root, height=130)
-frameBottom.pack_propagate(False)  # Evita que el frame cambie de tamaño
-frameBottom.pack(side="top", fill="both")
+# Frame inferior minimalista
+frameBottom = tk.Frame(root, bg="#f7f7f7")
+frameBottom.grid(row=1, column=0, sticky="nsew")
+
+# Fila de formato minimalista
+style = ttk.Style()
+style.configure("Minimal.TEntry", font=("Segoe UI", 10), padding=2, relief="flat")
+style.configure("Minimal.TLabel", font=("Segoe UI", 9), background="#f7f7f7", foreground="#222")
+style.configure("Minimal.TButton", font=("Segoe UI", 10), padding=0, relief="flat", background="#f7f7f7")
 
 def crear_fila_formato(parent, titulo, variable_entry):
-    fila = ttk.Frame(parent)
-    fila.pack(pady=4, side="top", anchor="center")
-    label = ttk.Label(fila, text=titulo, width=6, anchor="center")
-    label.pack(side="left", padx=2)
-    entry = ttk.Entry(fila, textvariable=variable_entry if variable_entry else None, justify='center', width=22)
-    entry.pack(side="left", padx=2)
-    btn = ttk.Button(fila, text="📋", width=2, command=lambda: copiar_formato(entry.get()))
-    btn.pack(side="left", padx=2)
+    fila = tk.Frame(parent, bg="#f7f7f7")
+    fila.pack(pady=6, anchor="center")
+    label = ttk.Label(fila, text=titulo, width=5, anchor="center", style="Minimal.TLabel")
+    label.pack(side="left", padx=(0, 4))
+    entry = ttk.Entry(fila, textvariable=variable_entry if variable_entry else None, justify='center', width=18, style="Minimal.TEntry")
+    entry.pack(side="left", padx=(0, 4))
+    btn = ttk.Button(fila, text="📋", width=2, style="Minimal.TButton", command=lambda: copiar_formato(entry.get()))
+    btn.pack(side="left")
     return entry
 
 # Variables para los valores
@@ -170,7 +189,6 @@ def capturarPunto(event=None):
     screenshot = pg.screenshot(region=(position[0]-1, position[1]-1, 1, 1))
     im = screenshot.convert('RGB')
     color = im.getpixel((0, 0))
-
     var_rgb.set(f'{color[0]} {color[1]} {color[2]}')
     var_hex.set(rgb_to_hex(color))
     var_hsl.set(rgb_to_hsl(color))
