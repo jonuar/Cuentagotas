@@ -8,13 +8,41 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 
 
+def rgb_to_hex(rgb):
+    return '#{:02x}{:02x}{:02x}'.format(*rgb)
+
+def rgb_to_hsl(rgb):
+    r, g, b = [x / 255.0 for x in rgb]
+    mx = max(r, g, b)
+    mn = min(r, g, b)
+    l = (mx + mn) / 2
+    if mx == mn:
+        h = s = 0
+    else:
+        d = mx - mn
+        s = d / (2 - mx - mn) if l > 0.5 else d / (mx + mn)
+        if mx == r:
+            h = (g - b) / d + (6 if g < b else 0)
+        elif mx == g:
+            h = (b - r) / d + 2
+        else:
+            h = (r - g) / d + 4
+        h /= 6
+    return f'H: {int(h*360)} S: {int(s*100)} L: {int(l*100)}'
+
+def copiar_formato(valor):
+    root.clipboard_clear()
+    root.clipboard_append(valor)
+    root.update()
+    print(f'Valor copiado al portapapeles: {valor}')
+
 def capturarPunto(event=None):
     # Coordenadas del cursor
     position = pg.position()
 
     # Captura del área
     screenshot = pg.screenshot(region=(position[0]-1, position[1]-1, 1, 1))
-    
+
     # Convierte la imagen a RGB
     im = screenshot.convert('RGB')
 
@@ -28,26 +56,18 @@ def capturarPunto(event=None):
     entry_rgb.delete(0, tk.END)
     entry_rgb.insert(0, f'{color[0]} {color[1]} {color[2]}')
 
-    print(f'R:{color[0]} G:{color[1]} B:{color[2]}')
+    hex_color = rgb_to_hex(color)
+    entry_hex.delete(0, tk.END)
+    entry_hex.insert(0, hex_color)
 
-    # Convertir en array, el área capturada con numpy
-    screenshot = np.array(screenshot)
-    print(screenshot[0][0])
+    hsl_color = rgb_to_hsl(color)
+    entry_hsl.delete(0, tk.END)
+    entry_hsl.insert(0, hsl_color)
 
     # Cambia el fondo de la ventana al color capturado
-    hex_color = f'#{color[0]:02x}{color[1]:02x}{color[2]:02x}'
     frameTop.config(background=hex_color)
-    print(hex_color)
 
     return color
-
-def copiar_al_portapapeles():
-    rgb_value = entry_rgb.get()  
-    root.clipboard_clear()
-    root.clipboard_append(rgb_value)
-    root.update()
-
-    print(f'Valor RGB copiado al portapapeles: {rgb_value}')
 
 # Función para actualizar la imagen en el Label de Tkinter
 def update_image():
@@ -82,40 +102,67 @@ def update_image():
 
 # Ventana principal
 root = tk.Tk()
-root.geometry("300x350")
+root.geometry("350x400")
 root.title("Cuentagotas")
 root.iconbitmap("favicon.ico")
 
 # Frame superior
 frameTop = tk.Frame(root)
 frameTop.pack(side="top", fill="both", expand=True)
+frameTop.pack_propagate(False)  # Evita que el frame cambie de tamaño
+
+# Frame contenedor para centrar vertical y horizontalmente
+frameTop_center = tk.Frame(frameTop)
+frameTop_center.pack(expand=True, anchor="center")
 
 # Label de la imagen
-label = ttk.Label(frameTop)
+label = ttk.Label(frameTop_center)
 label.pack(pady=15)
 
 # Instrucciones
 label_font = ("Helvetica", 10, "bold")
-label_instruction = ttk.Label(frameTop, text='Presiona ESPACIO para capturar', foreground="white", background="black", anchor="center", font=label_font)
-label_instruction.pack(ipadx=5, ipady=5)
+label_instruction = ttk.Label(frameTop_center, text='Presiona ESPACIO para capturar', foreground="white", background="black", anchor="center", font=label_font)
+label_instruction.pack(ipadx=5, ipady=10, padx=5)
 
 # Frame inferior
 frameBottom = ttk.Frame(root)
-frameBottom.pack(side="top", fill="both", expand=True)
+frameBottom.pack(side="top", fill="both")
 
-# Variable de valores RGB
-rgb_values = tk.StringVar()
-label_rgb = ttk.Label(frameBottom, textvariable=rgb_values)
-label_rgb.pack(pady=10)
+def crear_fila_formato(parent, titulo, variable_entry):
+    fila = ttk.Frame(parent)
+    fila.pack(pady=4, side="top", anchor="center")
+    label = ttk.Label(fila, text=titulo, width=6, anchor="center")
+    label.pack(side="left", padx=2)
+    entry = ttk.Entry(fila, textvariable=variable_entry if variable_entry else None, justify='center', width=22)
+    entry.pack(side="left", padx=2)
+    btn = ttk.Button(fila, text="📋", width=2, command=lambda: copiar_formato(entry.get()))
+    btn.pack(side="left", padx=2)
+    return entry
 
-# Entry de los valores RGB. Permite copiarlos
-entry_rgb = ttk.Entry(frameBottom, justify='center')
-entry_rgb.pack()
-# entry_rgb.grid(row=0, column=1, columnspan=2)
+# Variables para los valores
+var_rgb = tk.StringVar()
+var_hex = tk.StringVar()
+var_hsl = tk.StringVar()
 
-# Botones para copiar
-btn_copiar = ttk.Button(frameBottom, text="Copiar", command=copiar_al_portapapeles)
-btn_copiar.pack(pady=10)
+# RGB
+entry_rgb = crear_fila_formato(frameBottom, "RGB", var_rgb)
+# HEX
+entry_hex = crear_fila_formato(frameBottom, "HEX", var_hex)
+# HSL
+entry_hsl = crear_fila_formato(frameBottom, "HSL", var_hsl)
+
+# Actualiza los valores de los StringVar y Entry en capturarPunto
+def capturarPunto(event=None):
+    position = pg.position()
+    screenshot = pg.screenshot(region=(position[0]-1, position[1]-1, 1, 1))
+    im = screenshot.convert('RGB')
+    color = im.getpixel((0, 0))
+
+    var_rgb.set(f'{color[0]} {color[1]} {color[2]}')
+    var_hex.set(rgb_to_hex(color))
+    var_hsl.set(rgb_to_hsl(color))
+    frameTop.config(background=rgb_to_hex(color))
+    return color
 
 # Espacio para capturar el punto
 root.bind('<space>', capturarPunto)
