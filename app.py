@@ -102,7 +102,7 @@ def update_image():
 
 # Ventana principal
 root = tk.Tk()
-root.geometry("350x400")
+root.geometry("350x450")
 root.title("Cuentagotas")
 root.iconbitmap("favicon.ico")
 
@@ -124,8 +124,21 @@ label_font = ("Helvetica", 10, "bold")
 label_instruction = ttk.Label(frameTop_center, text='Presiona ESPACIO para capturar', foreground="white", background="black", anchor="center", font=label_font)
 label_instruction.pack(ipadx=5, ipady=10, padx=5)
 
+# Recuadro para mostrar el color elegido
+color_box = tk.Frame(
+    frameTop_center,
+    width=80,
+    height=40,
+    bg="#ffffff",
+    highlightbackground="#888888",  # Color del borde
+    highlightthickness=2
+)
+color_box.pack(pady=10)
+color_box.pack_propagate(False)  # Mantiene el tamaño fijo
+
 # Frame inferior
-frameBottom = ttk.Frame(root)
+frameBottom = ttk.Frame(root, height=130)
+frameBottom.pack_propagate(False)  # Evita que el frame cambie de tamaño
 frameBottom.pack(side="top", fill="both")
 
 def crear_fila_formato(parent, titulo, variable_entry):
@@ -161,7 +174,7 @@ def capturarPunto(event=None):
     var_rgb.set(f'{color[0]} {color[1]} {color[2]}')
     var_hex.set(rgb_to_hex(color))
     var_hsl.set(rgb_to_hsl(color))
-    frameTop.config(background=rgb_to_hex(color))
+    color_box.config(bg=rgb_to_hex(color))
     return color
 
 # Espacio para capturar el punto
