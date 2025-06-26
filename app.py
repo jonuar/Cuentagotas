@@ -32,42 +32,54 @@ def rgb_to_hsl(rgb):
     return f'H: {int(h*360)} S: {int(s*100)} L: {int(l*100)}'
 
 def copiar_formato(valor, boton=None):
-    root.clipboard_clear()
-    root.clipboard_append(valor)
-    root.update()
-    print(f'Valor copiado al portapapeles: {valor}')
-    mensaje_copiado.config(text="¡Valor copiado!")
-    mensaje_copiado.after(1200, lambda: mensaje_copiado.config(text=""))
+    try:
+        root.clipboard_clear()
+        root.clipboard_append(valor)
+        root.update()
+        print(f'Valor copiado al portapapeles: {valor}')
+        mensaje_copiado.config(text="¡Valor copiado!")
+        mensaje_copiado.after(1200, lambda: mensaje_copiado.config(text=""))
+    except Exception as e:
+        mensaje_copiado.config(text="Error al copiar: {}".format(e), fg="#e53935")
+        mensaje_copiado.after(2000, lambda: mensaje_copiado.config(text= "", fg="#4caf50"))
+        print("Error en copiar_formato: {}".format(e))
+
 
 def capturarPunto(event=None):
-    # Coordenadas del cursor
-    position = pg.position()
+    try:
+        # Coordenadas del cursor
+        position = pg.position()
 
-    # Captura del área
-    screenshot = pg.screenshot(region=(position[0]-1, position[1]-1, 1, 1))
+        # Captura del área
+        screenshot = pg.screenshot(region=(position[0]-1, position[1]-1, 1, 1))
 
-    # Convierte la imagen a RGB
-    im = screenshot.convert('RGB')
+        # Convierte la imagen a RGB
+        im = screenshot.convert('RGB')
 
-    # Obtiene el color del píxel en la posición (0, 0) de la región capturada
-    color = im.getpixel((0, 0))
+        # Obtiene el color del píxel en la posición (0, 0) de la región capturada
+        color = im.getpixel((0, 0))
 
-    # Colocar los valores RGB en el Entry para copiarlos
-    entry_rgb.delete(0, tk.END)
-    entry_rgb.insert(0, f'{color[0]} {color[1]} {color[2]}')
+        # Colocar los valores RGB en el Entry para copiarlos
+        entry_rgb.delete(0, tk.END)
+        entry_rgb.insert(0, f'{color[0]} {color[1]} {color[2]}')
 
-    hex_color = rgb_to_hex(color)
-    entry_hex.delete(0, tk.END)
-    entry_hex.insert(0, hex_color)
+        hex_color = rgb_to_hex(color)
+        entry_hex.delete(0, tk.END)
+        entry_hex.insert(0, hex_color)
 
-    hsl_color = rgb_to_hsl(color)
-    entry_hsl.delete(0, tk.END)
-    entry_hsl.insert(0, hsl_color)
+        hsl_color = rgb_to_hsl(color)
+        entry_hsl.delete(0, tk.END)
+        entry_hsl.insert(0, hsl_color)
 
-    # Cambia el fondo de la ventana al color capturado
-    frameTop.config(background=hex_color)
+        # Cambia el fondo de la ventana al color capturado
+        frameTop.config(background=hex_color)
 
-    return color
+        return color
+    except Exception as e:
+        mensaje_copiado.config(text="Error al capturar color: {}".format(e), fg="#e53935")
+        mensaje_copiado.after(2000, lambda: mensaje_copiado.config(text="", fg="#4caf50"))
+        print("Error en capturarPunto: {}".format(e))
+
 
 # Función para actualizar la imagen en el Label de Tkinter
 def update_image():
