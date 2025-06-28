@@ -30,7 +30,7 @@ def rgb_to_hsl(rgb):
         else:
             h = (r - g) / d + 4
         h /= 6
-    return f'H: {int(h*360)} S: {int(s*100)} L: {int(l*100)}'
+    return int(h*360), int(s*100), int(l*100)
 
 def copiar_formato(valor, boton=None):
     try:
@@ -71,10 +71,18 @@ def capturarPunto(event=None):
         entry_hsl.delete(0, tk.END)
         entry_hsl.insert(0, hsl_color)
 
-        # Cambia el fondo de la ventana al color capturado
-        frameTop.config(background=hex_color)
+        # Formatos listos para CSS/HTML
+        var_rgb.set("{}, {}, {}".format(color[0], color[1], color[2]))
+        var_hex.set(rgb_to_hex(color))
+        h, s, l = rgb_to_hsl(color)
+        var_hsl.set('{}, {}%, {}%'.format(h,s,l))
+        color_box.config(bg=rgb_to_hex(color))
+        actualizar_history(rgb_to_hex(color))
 
+        # Cambia el fondo de la ventana al color capturado
+        # frameTop.config(background=hex_color)
         return color
+    
     except Exception as e:
         mensaje_copiado.config(text="Error al capturar color: {}".format(e), fg="#e53935")
         mensaje_copiado.after(2000, lambda: mensaje_copiado.config(text="", fg="#4caf50"))
@@ -84,9 +92,10 @@ def mostrar_history_colors(hex_color):
     # Convierte HEX a RGB
     hex_color = hex_color.lstrip('#')
     rgb = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
-    var_rgb.set("{} {} {}".format(rgb[0], rgb[1], rgb[2]))
+    h, s, l = rgb_to_hsl(rgb)
+    var_rgb.set("{}, {}, {}".format(rgb[0], rgb[1], rgb[2]))
     var_hex.set("#{}".format(hex_color))
-    var_hsl.set(rgb_to_hsl(rgb))
+    var_hsl.set('{}, {}%, {}%'.format(h, s, l))
     color_box.config(bg="#{}".format(hex_color))
 
 # Función para actualizar la imagen en el Label de Tkinter
@@ -290,19 +299,6 @@ entry_hsl = crear_fila_formato(frameBottom, "HSL", var_hsl)
 # Mensaje de copiado
 mensaje_copiado = tk.Label(frameBottom, text="", fg="#4caf50", bg=BG_COLOR, font=("Segoe UI", 9, "bold"))
 mensaje_copiado.pack(pady=(0, 6))
-
-# Actualiza los valores de los StringVar y Entry en capturarPunto
-def capturarPunto(event=None):
-    position = pg.position()
-    screenshot = pg.screenshot(region=(position[0]-1, position[1]-1, 1, 1))
-    im = screenshot.convert('RGB')
-    color = im.getpixel((0, 0))
-    var_rgb.set(f'{color[0]} {color[1]} {color[2]}')
-    var_hex.set(rgb_to_hex(color))
-    var_hsl.set(rgb_to_hsl(color))
-    color_box.config(bg=rgb_to_hex(color))
-    actualizar_history(rgb_to_hex(color))
-    return color
 
 # Espacio para capturar el punto
 root.bind('<space>', capturarPunto)
