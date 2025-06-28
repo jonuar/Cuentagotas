@@ -8,6 +8,7 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 import darkdetect
 
+color_history = []
 
 def rgb_to_hex(rgb):
     return '#{:02x}{:02x}{:02x}'.format(*rgb)
@@ -44,7 +45,6 @@ def copiar_formato(valor, boton=None):
         mensaje_copiado.after(2000, lambda: mensaje_copiado.config(text= "", fg="#4caf50"))
         print("Error en copiar_formato: {}".format(e))
 
-
 def capturarPunto(event=None):
     try:
         # Coordenadas del cursor
@@ -80,6 +80,14 @@ def capturarPunto(event=None):
         mensaje_copiado.after(2000, lambda: mensaje_copiado.config(text="", fg="#4caf50"))
         print("Error en capturarPunto: {}".format(e))
 
+def mostrar_history_colors(hex_color):
+    # Convierte HEX a RGB
+    hex_color = hex_color.lstrip('#')
+    rgb = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    var_rgb.set("{} {} {}".format(rgb[0], rgb[1], rgb[2]))
+    var_hex.set("#{}".format(hex_color))
+    var_hsl.set(rgb_to_hsl(rgb))
+    color_box.config(bg="#{}".format(hex_color))
 
 # Función para actualizar la imagen en el Label de Tkinter
 def update_image():
@@ -111,7 +119,6 @@ def update_image():
     # Se llama a sí misma cada 10 ms
     root.after(10, update_image)
 
-
 # Detectar modo oscuro o claro
 if darkdetect.isDark():
     BG_COLOR = "#23272e"
@@ -138,7 +145,7 @@ else:
 
 # Ventana principal
 root = tk.Tk()
-root.geometry("320x400")
+root.geometry("320x500")
 root.title("Cuentagotas")
 root.iconbitmap("favicon.ico")
 root.configure(bg=BG_COLOR)
@@ -176,7 +183,7 @@ label_instruction.pack(pady=(0, 10))
 color_box = tk.Frame(
     frameTop_center,
     width=60,
-    height=32,
+    height=40,
     bg=BOX_BG,
     highlightbackground=BOX_BORDER,
     highlightthickness=1,
@@ -185,6 +192,35 @@ color_box = tk.Frame(
 )
 color_box.pack(pady=(0, 8))
 color_box.pack_propagate(False)
+
+label_history = ttk.Label(
+    frameTop_center,
+    text="History",
+    font=("Segoe UI", 8, "normal"),
+    foreground=FG_COLOR,
+    background=BG_COLOR
+)
+label_history.pack(pady=(0, 2))
+
+history_frame = tk.Frame(frameTop_center, bg=BG_COLOR)
+history_frame.pack(pady=(0, 10))
+
+# Frame de historial de colores
+history_boxes = []
+
+def on_click(event, idx):
+    if idx < len(color_history):
+        mostrar_history_colors(color_history[idx])
+        
+for i in range(5):
+    box = tk.Frame(history_frame, width=20, height=20, bg=BOX_BG, highlightbackground=BOX_BORDER, highlightthickness=1, relief="flat")
+    box.pack(side="left", padx=3)
+    box.pack_propagate(False)
+    history_boxes.append(box)
+    # binding para cada history box
+    box.bind("<Button-1>", lambda event, idx=i: on_click(event, idx))
+
+
 
 # Frame inferior minimalista
 frameBottom = tk.Frame(root, bg=BG_COLOR)
@@ -195,6 +231,18 @@ style = ttk.Style()
 style.configure("Minimal.TEntry", font=("Segoe UI", 10), padding=2, relief="flat", fieldbackground=ENTRY_BG, foreground=ENTRY_FG)
 style.configure("Minimal.TLabel", font=("Segoe UI", 9), background=BG_COLOR, foreground=FG_COLOR)
 style.configure("Minimal.TButton", font=("Segoe UI", 10), padding=0, relief="flat", background=BTN_BG, foreground=BTN_FG)
+
+def actualizar_history(nuevo_color):
+    # añade nuevo color al inicio y limita a 5
+    color_history.insert(0, nuevo_color)
+    if len(color_history) > 5:
+        color_history.pop()
+    # Actualiza los cuadros de historial
+    for i, box in enumerate(history_boxes):
+        if i < len(color_history):
+            box.config(bg=color_history[i])
+        else:
+            box.config(bg=BOX_BG)
 
 def crear_fila_formato(parent, titulo, variable_entry):
     fila = tk.Frame(parent, bg=BG_COLOR)
@@ -253,6 +301,7 @@ def capturarPunto(event=None):
     var_hex.set(rgb_to_hex(color))
     var_hsl.set(rgb_to_hsl(color))
     color_box.config(bg=rgb_to_hex(color))
+    actualizar_history(rgb_to_hex(color))
     return color
 
 # Espacio para capturar el punto
