@@ -1,7 +1,6 @@
 
 ENG
 # Eyedropper
-
 Script that captures the RGB, HEX, and HSL values of any pixel on the screen.
 
 ## Features
@@ -32,7 +31,6 @@ Script that captures the RGB, HEX, and HSL values of any pixel on the screen.
 
 SPA
 # Cuentagotas
-
 Script que toma el valor RGB, HEX y HSL de un pixel en la pantalla.
 
 ## Características
