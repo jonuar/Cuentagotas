@@ -229,8 +229,6 @@ for i in range(5):
     # binding para cada history box
     box.bind("<Button-1>", lambda event, idx=i: on_click(event, idx))
 
-
-
 # Frame inferior minimalista
 frameBottom = tk.Frame(root, bg=BG_COLOR)
 frameBottom.grid(row=1, column=0, sticky="nsew")
