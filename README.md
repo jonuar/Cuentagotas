@@ -36,6 +36,7 @@ SPA
 Script que toma el valor RGB, HEX y HSL de un pixel en la pantalla.
 
 ## Características
+
 - Muestra el color bajo el cursor en tiempo real.
 - Permite capturar el color con la tecla ESPACIO.
 - Visualiza el color elegido en un recuadro con borde.
