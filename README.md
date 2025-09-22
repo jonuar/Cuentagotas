@@ -2,7 +2,6 @@
 ENG
 
 # Eyedropper (COLOR PICKER)
-
 Script that captures the RGB, HEX, and HSL values of any pixel on the screen.
 
 ## Features
