@@ -5,7 +5,6 @@ ENG
 Script that captures the RGB, HEX, and HSL values of any pixel on the screen.
 
 ## Features
-
 - Displays the color under the cursor in real time.
 - Allows you to capture the color by pressing the SPACE key.
 - Shows the selected color in a bordered box.
