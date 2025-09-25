@@ -16,7 +16,6 @@ Script that captures the RGB, HEX, and HSL values of any pixel on the screen.
 - Adjusts Tkinter styles based on the time of day or system settings.
 
 ## Requirements
-
 - Python 3.x  
 - [requirements.txt](requirements.txt) (install with `pip install -r requirements.txt`)
 
